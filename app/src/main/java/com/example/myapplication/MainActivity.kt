@@ -32,6 +32,8 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.loader.app.LoaderManager
 import androidx.loader.content.CursorLoader
 import androidx.loader.content.Loader
+import java.io.BufferedReader
+import java.io.InputStreamReader
 import java.lang.Long
 import java.util.Date
 import java.util.concurrent.Executor
@@ -104,8 +106,16 @@ class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Cursor> 
         }
 
         findViewById<Button>(R.id.btn).setOnClickListener {
-            val intent = Intent(this, MyService::class.java)
-            bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
+//            val intent = Intent(this, MyService::class.java)
+//            bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE)
+
+            val process = Runtime.getRuntime().exec("ping -c 5 www.baidu.com")
+            process?.let {
+                val bufferedReader = BufferedReader(InputStreamReader(it.inputStream))
+                bufferedReader.forEachLine {
+                    Log.e("asd" , it)
+                }
+            }
         }
 
 
