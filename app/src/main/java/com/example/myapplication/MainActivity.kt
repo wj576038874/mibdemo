@@ -5,11 +5,14 @@ import android.content.ContentUris
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
+import android.database.ContentObserver
 import android.database.Cursor
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
 import android.os.IBinder
+import android.os.Looper
 import android.os.RemoteException
 import android.provider.CallLog
 import android.provider.MediaStore
@@ -90,7 +93,7 @@ class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Cursor> 
         myViewModel.getApplication<MyAp>().getShareViewModel().a()
 
         (application as MyAp).getShareViewModel().data.observe(this) {
-            Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
+//            Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
         }
 
 
@@ -103,6 +106,33 @@ class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Cursor> 
                 Toast.makeText(this, "截屏操作", Toast.LENGTH_SHORT).show()
                 LoaderManager.getInstance(this).initLoader(3, null, this)
             }
+        } else {
+            var lastUri : String? = null
+            contentResolver.registerContentObserver(
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                true,
+                object : ContentObserver(
+                    Handler(
+                        Looper.getMainLooper()
+                    )
+                ) {
+                    override fun onChange(selfChange: Boolean, uri: Uri?) {
+                        super.onChange(selfChange, uri)
+                        if (uri?.toString() == lastUri){
+                            return
+                        }
+                        //content://media/external/images/media/1000000127
+                        //content://media/external/images/media/1000000127
+                        //content://media/external/images/media/1000000127
+                        lastUri = uri?.toString()
+//                        imageView.setImageURI(ContentUris.withAppendedId(
+//                            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+//                            1000000127
+//                        ))
+                        Log.e("asd", "媒体库发生变化 ${Thread.currentThread().name}   $selfChange  " + uri.toString() +"   lastUri:$lastUri")
+                        LoaderManager.getInstance(this@MainActivity).initLoader(3, null, this@MainActivity)
+                    }
+                })
         }
 
         findViewById<Button>(R.id.btn).setOnClickListener {
@@ -113,7 +143,7 @@ class MainActivity : AppCompatActivity(), LoaderManager.LoaderCallbacks<Cursor> 
             process?.let {
                 val bufferedReader = BufferedReader(InputStreamReader(it.inputStream))
                 bufferedReader.forEachLine {
-                    Log.e("asd" , it)
+                    Log.e("asd", it)
                 }
             }
         }

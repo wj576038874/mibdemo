@@ -33,8 +33,8 @@ class MediaCursorLoader private constructor(
                 projection,
                 "${MediaStore.Images.Media.DATE_ADDED} >? AND ${MediaStore.Images.Media.DATE_ADDED} <?",
                 arrayOf(
-                    (System.currentTimeMillis() / 1000 - 20).toString(),
-                    (System.currentTimeMillis() / 1000 + 20).toString()
+                    (System.currentTimeMillis() / 1000 - 200).toString(),
+                    (System.currentTimeMillis() / 1000 + 200).toString()
                 ),
                 MediaStore.Images.Media.DATE_ADDED + " DESC"
             )
